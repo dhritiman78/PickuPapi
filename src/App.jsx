@@ -29,6 +29,7 @@ export default function App() {
   };
 
   const saveFavorite = () => {
+    if (!pickupLine) return;
     const updated = [...favorites, pickupLine];
     setFavorites(updated);
     localStorage.setItem("favorites", JSON.stringify(updated));
@@ -40,14 +41,13 @@ export default function App() {
     localStorage.setItem("favorites", JSON.stringify(updated));
   };
 
-  const formatPickupLine = (line) => {
-    return line.replace(/\*(.*?)\*/g, `<span classname="font-bold">$1</span>`);
-  };
-  
-
   const sendViaWhatsApp = (line) => {
     const url = `https://wa.me/?text=${encodeURIComponent(line)}`;
     window.open(url, "_blank");
+  };
+
+  const formatPickupLine = (line) => {
+    return line.replace(/\*(.*?)\*/g, '<span class="font-bold">$1</span>');
   };
 
   useEffect(() => {
@@ -56,21 +56,28 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-violet-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-pink-100 to-violet-200 p-4 font-sans">
       {/* Navbar */}
       <nav className="bg-white shadow-md p-4 rounded-lg mb-6 sticky top-0 z-10">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-violet-600 text-center">
+        <h1 className="text-3xl font-extrabold text-violet-600 text-center tracking-wide">
           💘 PickuPapi
         </h1>
       </nav>
 
-      <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6">
+      {/* Intro */}
+      <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6 mb-6">
+        <p className="text-center text-violet-500 text-sm md:text-base leading-relaxed mb-4 font-bold">
+          Impress your ❤️ love/crush 💕 by generating the perfect pickup line!
+          <br />
+          Be cheesy, be funny, be bold — let the flirting begin! 😏✨
+        </p>
+
         <input
           type="text"
-          placeholder="Enter a name or topic..."
+          placeholder="Enter a name, hobby, or topic..."
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
-          className="border border-violet-300 rounded-lg p-3 w-full mb-4 focus:outline-none focus:ring-2 focus:ring-violet-400"
+          className="border border-violet-300 rounded-lg p-3 w-full mb-4 focus:outline-none focus:ring-2 focus:ring-violet-400 transition"
         />
 
         <button
@@ -87,15 +94,19 @@ export default function App() {
           )}
         </button>
 
+        {/* Generated Pickup Line */}
         {pickupLine && (
-          <div className="mt-6 bg-violet-50 p-4 rounded-lg">
-            <p className="text-md text-violet-800 mb-3">💬 {formatPickupLine(pickupLine)}</p>
-            <div className="flex justify-end gap-4 text-lg text-violet-700">
-            <FaWhatsapp
-                      className="cursor-pointer hover:text-green-600 transition"
-                      onClick={() => sendViaWhatsApp(pickupLine)}
-                      title="Share on WhatsApp"
+          <div className="mt-6 bg-violet-50 p-4 rounded-lg animate-fade-in">
+            <p
+              className="text-md text-violet-800 mb-3"
+              dangerouslySetInnerHTML={{ __html: `💬 ${formatPickupLine(pickupLine)}` }}
             />
+            <div className="flex justify-end gap-4 text-lg text-violet-700">
+              <FaWhatsapp
+                className="cursor-pointer hover:text-green-600 transition"
+                onClick={() => sendViaWhatsApp(pickupLine)}
+                title="Share on WhatsApp"
+              />
               <FaHeart
                 className="cursor-pointer hover:text-red-500 transition"
                 onClick={saveFavorite}
@@ -110,6 +121,7 @@ export default function App() {
           </div>
         )}
 
+        {/* Favorites Section */}
         {favorites.length > 0 && (
           <div className="mt-8">
             <h2 className="text-xl font-semibold text-violet-600 mb-3">⭐ Favorites</h2>
@@ -119,7 +131,8 @@ export default function App() {
                   key={idx}
                   className="flex items-center justify-between bg-white p-3 rounded-lg shadow-sm"
                 >
-                  <p className="text-sm text-violet-800">- {line}</p>
+                  <p className="text-sm text-violet-800 w-4/5"
+                  dangerouslySetInnerHTML={{ __html: `- ${formatPickupLine(line)}` }}></p>
                   <div className="flex gap-2 text-violet-700 text-lg">
                     <FaWhatsapp
                       className="cursor-pointer hover:text-green-600 transition"
@@ -138,10 +151,21 @@ export default function App() {
           </div>
         )}
 
-        <footer className="mt-8 text-center text-gray-500 text-sm">
+        <footer className="mt-8 text-center text-gray-500 text-xs">
           Made with ❤️ by Dhritiman Saikia
         </footer>
       </div>
+
+      {/* Animation Style */}
+      <style>{`
+        .animate-fade-in {
+          animation: fadeIn 0.6s ease-in-out;
+        }
+        @keyframes fadeIn {
+          0% { opacity: 0; transform: translateY(10px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
